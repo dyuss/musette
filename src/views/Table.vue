@@ -18,6 +18,9 @@
         </template>
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
+          <td :class="totalClass(props.item.totalByPairs)">
+            {{ props.item.totalByPairs }}
+          </td>
           <td :class="totalClass(props.item.total)">{{ props.item.total }}</td>
           <td>{{ props.item.spent }}</td>
           <td v-for="p in purchases" :key="p.id">{{ props.item[p.id] }}</td>
@@ -50,6 +53,11 @@ export default {
       const name = {text: 'Имя', value: 'name', sortable: false};
       const spent = {text: 'Потратил', value: 'spent', sortable: false};
       const total = {text: 'Итого', value: 'total', sortable: false};
+      const totalByPairs = {
+        text: 'Итого<br/>(пары)',
+        value: 'totalByPairs',
+        sortable: false,
+      };
       const purchases = this.purchases.map(p => {
         return {
           text: `${p.title}<br/>(${p.cost})`,
@@ -58,7 +66,7 @@ export default {
         };
       });
 
-      return [name, total, spent, ...purchases];
+      return [name, totalByPairs, total, spent, ...purchases];
     },
     tableItems() {
       let items = this.persons.map(p => {
@@ -66,13 +74,32 @@ export default {
           name: p.name,
           spent: this.spent(p),
           total: this.spent(p),
+          totalByPairs: 0,
         };
         for (let pur of this.purchases) {
           const debt = this.forPurchase(p, pur);
           item[pur.id] = debt;
           item.total -= debt;
         }
+        item.totalByPairs = item.total;
         return item;
+      });
+      this.persons.forEach(p => {
+        if (!p.pair) {
+          return;
+        }
+        let total = this.getItemByPersonId(items, p.id).total;
+        let totalPair = this.getItemByPersonId(items, p.pair).total;
+        const delta = total + totalPair;
+        if (Math.abs(total) > Math.abs(totalPair)) {
+          totalPair = 0;
+          total = delta;
+        } else {
+          total = 0;
+          totalPair = delta;
+        }
+        this.getItemByPersonId(items, p.id).totalByPairs = total;
+        this.getItemByPersonId(items, p.pair).totalByPairs = totalPair;
       });
       return items;
     },
@@ -95,6 +122,13 @@ export default {
       if (total > 0) cl = 'green lighten-4';
       if (total < 0) cl = 'red lighten-4';
       return cl;
+    },
+    getPersonById(id) {
+      return this.persons.find(p => p.id == id);
+    },
+    getItemByPersonId(items, id) {
+      const p = this.getPersonById(id);
+      return items.find(it => it.name == p.name);
     },
   },
 };
