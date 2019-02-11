@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import store from "../store.js";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   data() {
@@ -41,16 +41,18 @@ export default {
       nameRules: [
         v => !!v || "Имя обязательно",
         v => v.length > 2 || "Имя должно быть минимум из 3 символов",
-        v => !store.persons.find(p => p.name == v) || "Это имя уже используется"
+        v => !this.persons.find(p => p.name == v) || "Это имя уже используется"
       ]
     };
   },
   computed: {
+    ...mapState(['persons']),
     pairItems: function() {
-      return ["без пары", ...store.persons];
+      return ["без пары", ...this.persons];
     }
   },
   methods: {
+    ...mapMutations(['createPerson']),
     validate() {
       if (this.$refs.form.validate()) {
         const newPerson = {
@@ -62,12 +64,12 @@ export default {
           pair: this.pair == "без пары" ? undefined : this.pair
         };
         if (newPerson.pair) {
-          store.persons.forEach(p => {
+          this.persons.forEach(p => {
             if (p.id == newPerson.pair) p.pair = newPerson.id;
             if (p.pair == newPerson.pair) p.pair = undefined;
           });
         }
-        store.persons.push(newPerson);
+        this.createPerson(newPerson);
         this.$router.push("/");
       }
     }

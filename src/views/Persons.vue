@@ -26,17 +26,15 @@
 </template>
 
 <script>
-import store from "../store.js";
+import { mapState } from "vuex";
 import BottomNav from "@/components/BottomNav.vue";
 
 export default {
   components: {
     BottomNav
   },
-  data() {
-    return {
-      persons: store.persons
-    };
+  computed: {
+    ...mapState(["persons"])
   },
   methods: {
     humanDays: function(d) {
