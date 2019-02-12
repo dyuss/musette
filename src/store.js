@@ -22,6 +22,11 @@ export default new Vuex.Store({
       { id: '1e5bc3eaf77e3', name: 'Костян', days: 2, pair: 'd5948a9796a9b' },
     ]
   },
+  getters: {
+    getPersonById: state => id => {
+      return state.persons.find(p => p.id == id)
+    }
+  },
   mutations: {
     createPerson(state, person) {
       state.persons.push(person)
