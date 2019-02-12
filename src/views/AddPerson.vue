@@ -63,12 +63,6 @@ export default {
           days: parseInt(this.days),
           pair: this.pair == "без пары" ? undefined : this.pair
         };
-        if (newPerson.pair) {
-          this.persons.forEach(p => {
-            if (p.id == newPerson.pair) p.pair = newPerson.id;
-            if (p.pair == newPerson.pair) p.pair = undefined;
-          });
-        }
         this.createPerson(newPerson);
         this.$router.push("/");
       }

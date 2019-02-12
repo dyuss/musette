@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  strict: true,
   state: {
     persons: [
       { id: '13fe652751f73', name: 'Блонд', days: 2, pair: '1a00fc87b1832' },
@@ -29,6 +30,12 @@ export default new Vuex.Store({
   },
   mutations: {
     createPerson(state, person) {
+      if (person.pair) {
+        state.persons.forEach(p => {
+          if (p.id == person.pair) p.pair = person.id;
+          if (p.pair == person.pair) p.pair = undefined;
+        });
+      }
       state.persons.push(person)
     }
   },
