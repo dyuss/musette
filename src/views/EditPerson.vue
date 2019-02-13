@@ -25,33 +25,29 @@
         <v-container class="px-2">
           <v-layout row justify-space-around>
             <v-btn :disabled="!valid" color="success" @click="validate" block class="mr-2">Изменить</v-btn>
-            <v-btn :disabled="!valid" color="error" @click="deleteDialog = true" block>Удалить</v-btn>
+            <v-btn :disabled="!valid" color="error" @click.stop="showDeleteDialog = true" block>Удалить</v-btn>
           </v-layout>
         </v-container>
       </v-form>
 
-      <v-dialog v-model="deleteDialog">
-        <v-card>
-          <v-card-text>Вы действительно хотите удалить этого человека?</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="info darken-1" flat="flat" @click="deleteDialog = false">Нет</v-btn>
-            <v-btn color="error darken-1" flat="flat" @click="deletePerson">Удалить</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <DeleteDialog
+        :visible.sync="showDeleteDialog"
+        :action="deletePerson"
+      >Вы действительно хотите удалить этого человека?</DeleteDialog>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import store from "../store.js";
+import DeleteDialog from "@/components/DeleteDialog.vue";
+import { mapState, mapGetters } from "vuex";
 
 export default {
+  components: { DeleteDialog },
   data() {
     return {
       valid: true,
-      deleteDialog: false,
+      showDeleteDialog: false,
       id: null,
       name: "",
       days: "1",
@@ -63,9 +59,16 @@ export default {
       ]
     };
   },
+  computed: {
+    ...mapState(["persons"]),
+    ...mapGetters(["getPersonById"]),
+    pairItems: function() {
+      return ["без пары", ...this.persons];
+    }
+  },
   created() {
     this.id = this.$route.params.id;
-    const person = store.persons.find(p => p.id == this.id);
+    const person = this.getPersonById(this.id);
     if (!person) {
       this.$router.push("/");
     }
@@ -74,15 +77,10 @@ export default {
     this.days = person.days.toString();
     this.pair = person.pair || "без пары";
   },
-  computed: {
-    pairItems: function() {
-      return ["без пары", ...store.persons];
-    }
-  },
   methods: {
     isNameExistRule(v) {
       return (
-        !store.persons.find(p => p.name == v && v != this.oldName) ||
+        !this.persons.find(p => p.name == v && v != this.oldName) ||
         "Это имя уже используется"
       );
     },
@@ -95,31 +93,31 @@ export default {
           days: parseInt(this.days),
           pair: this.pair == "без пары" ? undefined : this.pair
         };
-        store.persons.forEach((p, i) => {
+        this.persons.forEach((p, i) => {
           if (p.pair == newPerson.id || p.pair == newPerson.pair)
             p.pair = undefined;
           if (p.id == newPerson.pair) p.pair = newPerson.id;
-          if (p.id == newPerson.id) store.persons[i] = newPerson;
+          if (p.id == newPerson.id) this.persons[i] = newPerson;
         });
         this.$router.push("/");
       }
     },
 
     deletePerson() {
-      store.persons = store.persons.filter(p => p.id != this.id);
+      this.persons = this.persons.filter(p => p.id != this.id);
 
-      store.persons.forEach(p => {
+      this.persons.forEach(p => {
         if (p.pair == this.id) p.pair = undefined;
       });
 
-      store.purchases = store.purchases.map(p => {
+      this.purchases = this.purchases.map(p => {
         if (p.share.includes(this.id)) {
           p.share = p.share.filter(s => s != this.id);
         }
         return p;
       });
 
-      store.purchases = store.purchases.filter(p => p.who != this.id);
+      this.purchases = this.purchases.filter(p => p.who != this.id);
 
       this.$router.push("/");
     }
