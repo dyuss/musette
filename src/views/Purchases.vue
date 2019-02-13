@@ -14,8 +14,8 @@
           <v-list-tile :key="p.id" ripple @click="edit(p.id)">
             <v-list-tile-content>
               <v-list-tile-title>{{ p.title }}</v-list-tile-title>
-              <v-list-tile-sub-title class="text--primary">{{ humanWho(p.who) }}</v-list-tile-sub-title>
-              <v-list-tile-sub-title>{{ humanShare(p.share) }}</v-list-tile-sub-title>
+              <v-list-tile-sub-title class="text--primary">{{ getPersonById(p.who).name }}</v-list-tile-sub-title>
+              <v-list-tile-sub-title>{{ displayShareNames(p.share) }}</v-list-tile-sub-title>
             </v-list-tile-content>
 
             <v-list-tile-action>
@@ -33,24 +33,20 @@
 </template>
 
 <script>
-import store from "../store.js";
 import BottomNav from "@/components/BottomNav.vue";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   components: {
     BottomNav
   },
-  data() {
-    return {
-      purchases: store.purchases
-    };
+  computed: {
+    ...mapState(["purchases"]),
+    ...mapGetters(["getPersonById"])
   },
   methods: {
-    humanWho(who) {
-      return store.persons.find(p => p.id == who).name;
-    },
-    humanShare(share) {
-      return share.map(s => store.persons.find(p => p.id == s).name).join(", ");
+    displayShareNames(share) {
+      return share.map(s => this.getPersonById(s).name).join(", ");
     },
     edit: function(id) {
       this.$router.push("/edit-purchase/" + id);
