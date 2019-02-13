@@ -32,7 +32,7 @@
 
       <DeleteDialog
         :visible.sync="showDeleteDialog"
-        :action="deletePerson"
+        :action="onDeletePerson"
       >Вы действительно хотите удалить этого человека?</DeleteDialog>
     </v-content>
   </v-app>
@@ -40,7 +40,7 @@
 
 <script>
 import DeleteDialog from "@/components/DeleteDialog.vue";
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters, mapMutations } from "vuex";
 
 export default {
   components: { DeleteDialog },
@@ -63,7 +63,7 @@ export default {
     ...mapState(["persons"]),
     ...mapGetters(["getPersonById"]),
     pairItems: function() {
-      return ["без пары", ...this.persons];
+      return ["без пары", ...this.persons.filter(p => p.id != this.id)];
     }
   },
   created() {
@@ -78,6 +78,7 @@ export default {
     this.pair = person.pair || "без пары";
   },
   methods: {
+    ...mapMutations(["deletePerson", "updatePerson"]),
     isNameExistRule(v) {
       return (
         !this.persons.find(p => p.name == v && v != this.oldName) ||
@@ -87,38 +88,19 @@ export default {
 
     validate() {
       if (this.$refs.form.validate()) {
-        const newPerson = {
+        const editedPerson = {
           id: this.id,
           name: this.name,
           days: parseInt(this.days),
           pair: this.pair == "без пары" ? undefined : this.pair
         };
-        this.persons.forEach((p, i) => {
-          if (p.pair == newPerson.id || p.pair == newPerson.pair)
-            p.pair = undefined;
-          if (p.id == newPerson.pair) p.pair = newPerson.id;
-          if (p.id == newPerson.id) this.persons[i] = newPerson;
-        });
+        this.updatePerson(editedPerson)
         this.$router.push("/");
       }
     },
 
-    deletePerson() {
-      this.persons = this.persons.filter(p => p.id != this.id);
-
-      this.persons.forEach(p => {
-        if (p.pair == this.id) p.pair = undefined;
-      });
-
-      this.purchases = this.purchases.map(p => {
-        if (p.share.includes(this.id)) {
-          p.share = p.share.filter(s => s != this.id);
-        }
-        return p;
-      });
-
-      this.purchases = this.purchases.filter(p => p.who != this.id);
-
+    onDeletePerson() {
+      this.deletePerson(this.id)
       this.$router.push("/");
     }
   }
