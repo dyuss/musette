@@ -138,6 +138,9 @@ export default new Vuex.Store({
         if (p.id == person.pair) p.pair = person.id;
         if (p.id == person.id) state.persons[i] = person;
       });
+    },
+    createPurchase(state, purchase) {
+      state.purchases.push(purchase);
     }
   },
   actions: {

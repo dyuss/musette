@@ -14,7 +14,7 @@
 
         <v-select
           v-model="who"
-          :items="personsItems"
+          :items="persons"
           item-text="name"
           item-value="id"
           label="Кто платил"
@@ -23,7 +23,7 @@
 
         <v-select
           v-model="share"
-          :items="shareItems"
+          :items="persons"
           :menu-props="{ maxHeight: '400' }"
           label="Кто скидывается"
           item-text="name"
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import store from "../store.js";
+import { mapState, mapMutations } from 'vuex';
 
 export default {
   data() {
@@ -50,12 +50,12 @@ export default {
       title: "",
       cost: "",
       who: "",
-      share: store.persons.map(p => p.id),
+      share: [],
       titleRules: [
         v => !!v || "Название обязательно",
         v => v.length > 2 || "Название должно быть минимум из 3 символов",
         v =>
-          !store.purchases.find(p => p.title == v) ||
+          !this.purchases.find(p => p.title == v) ||
           "Это название уже используется"
       ],
       costRules: [
@@ -68,15 +68,14 @@ export default {
       shareRules: [v => v.length > 0 || "Кто-то должен скидываться за покупки"]
     };
   },
+  created() {
+    this.share = this.persons.map(p => p.id);
+  },
   computed: {
-    personsItems() {
-      return store.persons;
-    },
-    shareItems() {
-      return store.persons;
-    }
+    ...mapState(["persons", "purchases"]),
   },
   methods: {
+    ...mapMutations(["createPurchase"]),
     validate() {
       if (this.$refs.form.validate()) {
         const newPurchase = {
@@ -89,7 +88,7 @@ export default {
           share: this.share
         };
        
-        store.purchases.push(newPurchase);
+        this.createPurchase(newPurchase);
         this.$router.push("/purchases");
       }
     }
