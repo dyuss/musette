@@ -14,7 +14,7 @@
 
         <v-select
           v-model="who"
-          :items="personsItems"
+          :items="persons"
           item-text="name"
           item-value="id"
           label="Кто платил"
@@ -22,7 +22,7 @@
 
         <v-select
           v-model="share"
-          :items="shareItems"
+          :items="persons"
           :menu-props="{ maxHeight: '400' }"
           label="Кто скидывается"
           item-text="name"
@@ -36,33 +36,29 @@
         <v-container class="px-2">
           <v-layout row justify-space-around>
             <v-btn :disabled="!valid" color="success" @click="validate" block class="mr-2">Изменить</v-btn>
-            <v-btn :disabled="!valid" color="error" @click="deleteDialog = true" block>Удалить</v-btn>
+            <v-btn :disabled="!valid" color="error" @click="showDeleteDialog = true" block>Удалить</v-btn>
           </v-layout>
         </v-container>
       </v-form>
 
-      <v-dialog v-model="deleteDialog">
-        <v-card>
-          <v-card-text>Вы действительно хотите удалить эту покупку?</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="info darken-1" flat="flat" @click="deleteDialog = false">Нет</v-btn>
-            <v-btn color="error darken-1" flat="flat" @click="deletePerson">Удалить</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <DeleteDialog
+        :visible.sync="showDeleteDialog"
+        :action="onDeletePurchase"
+      >Вы действительно хотите удалить эту покупку?</DeleteDialog>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import store from "../store.js";
+import DeleteDialog from "@/components/DeleteDialog.vue";
+import { mapMutations, mapGetters, mapState } from 'vuex';
 
 export default {
+  components: { DeleteDialog },
   data() {
     return {
       valid: true,
-      deleteDialog: false,
+      showDeleteDialog: false,
       id: null,
       title: "",
       cost: "",
@@ -82,7 +78,7 @@ export default {
   },
   created() {
     this.id = this.$route.params.id;
-    const purchase = store.purchases.find(p => p.id == this.id);
+    const purchase = this.getPurchaseById(this.id);
     if (!purchase) {
       this.$router.push("/purchases");
     }
@@ -93,17 +89,14 @@ export default {
     this.share = purchase.share;
   },
   computed: {
-    personsItems() {
-      return store.persons;
-    },
-    shareItems() {
-      return store.persons;
-    }
+    ...mapState(["persons", "purchases"]),
+    ...mapGetters(["getPurchaseById"])
   },
   methods: {
+    ...mapMutations(["updatePurchase", "deletePurchase"]),
     isTitleExistRule(v) {
       return (
-        !store.purchases.find(p => p.title == v && v != this.oldTitle) ||
+        !this.purchases.find(p => p.title == v && v != this.oldTitle) ||
         "Это название уже используется"
       );
     },
@@ -118,15 +111,13 @@ export default {
           share: this.share
         };
 
-        const index = store.purchases.findIndex(p => p.id == editedPurchase.id);
-        store.purchases[index] = editedPurchase;
-
+        this.updatePurchase(editedPurchase);
         this.$router.push("/purchases");
       }
     },
 
-    deletePerson() {
-      store.purchases = store.purchases.filter(p => p.id != this.id);
+    onDeletePurchase() {
+      this.deletePurchase(this.id)
       this.$router.push("/purchases");
     }
   }

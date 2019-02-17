@@ -103,6 +103,9 @@ export default new Vuex.Store({
   getters: {
     getPersonById: state => id => {
       return state.persons.find(p => p.id == id)
+    },
+    getPurchaseById: state => id => {
+      return state.purchases.find(p => p.id == id)
     }
   },
   mutations: {
@@ -141,6 +144,14 @@ export default new Vuex.Store({
     },
     createPurchase(state, purchase) {
       state.purchases.push(purchase);
+    },
+    updatePurchase(state, purchase) {
+      const index = state.purchases.findIndex(p => p.id == purchase.id);
+      state.purchases[index] = purchase;
+
+    },
+    deletePurchase(state, id) {
+      state.purchases = state.purchases.filter(p => p.id != id);
     }
   },
   actions: {
