@@ -104,6 +104,9 @@ export default new Vuex.Store({
     getPersonById: state => id => {
       return state.persons.find(p => p.id == id)
     },
+    getPersonByName: state => name => {
+      return state.persons.find(p => p.name == name)
+    },
     getPurchaseById: state => id => {
       return state.purchases.find(p => p.id == id)
     }
