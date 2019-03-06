@@ -1,5 +1,5 @@
 <template>
-  <v-bottom-nav :active="current" :value="true" fixed >
+  <v-bottom-nav :active="current" :value="true" fixed>
     <v-btn color="teal" flat value="persons" to="/">
       <span>Люди</span>
       <v-icon>group</v-icon>
