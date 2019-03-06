@@ -74,6 +74,7 @@ export default {
     }
     this.oldName = person.name;
     this.name = person.name;
+    this.isDebtor = person.isDebtor;
     this.days = person.days.toString();
     this.pair = person.pair || "без пары";
   },
@@ -91,6 +92,7 @@ export default {
         const editedPerson = {
           id: this.id,
           name: this.name,
+          isDebtor: this.isDebtor,
           days: parseInt(this.days),
           pair: this.pair == "без пары" ? undefined : this.pair
         };

@@ -6,11 +6,11 @@ Vue.use(Vuex)
 
 const mockStore = {
   persons: [
-    { id: '13fe652751f73', name: 'Лили', days: 2, pair: '1a00fc87b1832' },
-    { id: '1a00fc87b1832', name: 'Маршал', days: 2, pair: '13fe652751f73' },
-    { id: '936512921cdfb', name: 'Тед', days: 2 },
-    { id: 'a67da33cdbc55', name: 'Робин', days: 1 },
-    { id: '8acd7ed98dfcd', name: 'Барни', days: 1 },
+    { id: '13fe652751f73', name: 'Лили', days: 2, pair: '1a00fc87b1832', isDebtor: false },
+    { id: '1a00fc87b1832', name: 'Маршал', days: 2, pair: '13fe652751f73', isDebtor: false },
+    { id: '936512921cdfb', name: 'Тед', days: 2, isDebtor: false },
+    { id: 'a67da33cdbc55', name: 'Робин', days: 1, isDebtor: false },
+    { id: '8acd7ed98dfcd', name: 'Барни', days: 1, isDebtor: false },
   ],
   purchases: [
     {

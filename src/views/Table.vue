@@ -13,6 +13,9 @@
         </template>
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
+          <td class="debtor">
+            <v-checkbox height="48" v-model="props.item.isDebtor" @change="toggleDebtor(props.item)"></v-checkbox>
+          </td>
           <td :class="totalClass(props.item.totalByPairs)">{{ props.item.totalByPairs }}</td>
           <td :class="totalClass(props.item.total)">{{ props.item.total }}</td>
           <td>{{ props.item.spent }}</td>
@@ -26,7 +29,7 @@
 
 <script>
 import BottomNav from "@/components/BottomNav.vue";
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters, mapMutations } from "vuex";
 
 export default {
   components: {
@@ -37,6 +40,7 @@ export default {
     ...mapGetters(["getPersonById", "getPersonByName"]),
     tableHeaders() {
       const name = { text: "Имя", value: "name", sortable: false };
+      const isDebtor = { text: "Сдал", value: "isDebtor", sortable: false };
       const spent = { text: "Потратил", value: "spent", sortable: false };
       const total = { text: "Итого", value: "total", sortable: false };
       const totalByPairs = {
@@ -51,12 +55,13 @@ export default {
           sortable: false
         };
       });
-      return [name, totalByPairs, total, spent, ...purchases];
+      return [name, isDebtor, totalByPairs, total, spent, ...purchases];
     },
     tableItems() {
       let items = this.persons.map(p => {
         let item = {
           name: p.name,
+          isDebtor: p.isDebtor,
           spent: this.getSpending(p),
           total: this.getSpending(p)
         };
@@ -73,6 +78,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(["updatePerson"]),
     getDebtForPurchase(person, purchase) {
       if (!purchase.share.includes(person.id)) return 0;
       return Math.ceil(purchase.cost / purchase.share.length);
@@ -100,7 +106,12 @@ export default {
         [item.totalByPairs, pairItem.totalByPairs] =
           Math.abs(item.total) > Math.abs(pairItem.total) ? [sum, 0] : [0, sum];
       });
-    }
+    },
+    toggleDebtor(item){
+      let editedPerson = {...this.getPersonByName(item.name)};
+      editedPerson.isDebtor = item.isDebtor
+      this.updatePerson(editedPerson)
+    },
   }
 };
 </script>
@@ -108,5 +119,8 @@ export default {
 <style>
 .ttable {
   margin-bottom: 70px;
+}
+.debtor {
+  display: block;
 }
 </style>

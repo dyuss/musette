@@ -60,6 +60,7 @@ export default {
             .toString(16)
             .slice(2),
           name: this.name,
+          isDebtor: false,
           days: parseInt(this.days),
           pair: this.pair == "без пары" ? undefined : this.pair
         };
