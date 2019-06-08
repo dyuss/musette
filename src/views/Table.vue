@@ -16,8 +16,8 @@
           <td class="debtor">
             <v-checkbox height="48" v-model="props.item.isDebtor" @change="toggleDebtor(props.item)"></v-checkbox>
           </td>
-          <td :class="totalClass(props.item.totalByPairs)">{{ props.item.totalByPairs }}</td>
-          <td :class="totalClass(props.item.total)">{{ props.item.total }}</td>
+          <td :class="totalClass(props.item.totalByPairs)"><b>{{ props.item.totalByPairs }}</b></td>
+          <td>{{ props.item.total }}</td>
           <td>{{ props.item.spent }}</td>
           <td v-for="p in purchases" :key="p.id">{{ props.item[p.id] }}</td>
         </template>
