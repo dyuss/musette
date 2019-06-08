@@ -85,7 +85,7 @@ export default {
     },
     getSpending(person) {
       return this.purchases.reduce((a, p) => {
-        return p.who == person.id ? a + p.cost : a;
+        return p.who == person.id ? a + parseInt(p.cost) : a;
       }, 0);
     },
     totalClass(total) {
