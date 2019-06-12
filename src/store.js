@@ -108,6 +108,10 @@ export default new Vuex.Store({
     },
     deletePurchase(state, id) {
       state.purchases = state.purchases.filter(p => p.id != id);
+    },
+    clearAll(state) {
+      state.purchases = [];
+      state.persons = [];
     }
   },
   actions: {

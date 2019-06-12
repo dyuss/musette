@@ -9,6 +9,7 @@
     </v-toolbar>
 
     <v-content>
+      <div class="no-purchases-text" v-if="purchases.length == 0">Пока нет ни одной покупки.</div>
       <v-list two-line class="mb-5">
         <template v-for="(p, i) in purchases">
           <v-list-tile :key="p.id" ripple @click="edit(p.id)">
@@ -54,3 +55,10 @@ export default {
   }
 };
 </script>
+
+<style>
+.no-purchases-text {
+  text-align: center;
+  padding-top: 10px; 
+}
+</style>

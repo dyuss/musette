@@ -5,23 +5,26 @@
     </v-toolbar>
 
     <v-content>
-      <v-data-table :headers="tableHeaders" :items="tableItems" hide-actions class="ttable">
-        <template slot="headers" slot-scope="props">
-          <th v-for="header in props.headers" :key="header.text">
-            <span v-html="header.text"></span>
-          </th>
-        </template>
-        <template slot="items" slot-scope="props">
-          <td>{{ props.item.name }}</td>
-          <td class="debtor">
-            <v-checkbox height="48" v-model="props.item.isDebtor" @change="toggleDebtor(props.item)"></v-checkbox>
-          </td>
-          <td :class="totalClass(props.item.totalByPairs)"><b>{{ props.item.totalByPairs }}</b></td>
-          <td>{{ props.item.total }}</td>
-          <td>{{ props.item.spent }}</td>
-          <td v-for="p in purchases" :key="p.id">{{ props.item[p.id] }}</td>
-        </template>
-      </v-data-table>
+      <div class="no-table-text" v-if="purchases.length == 0">Таблица появится, когда вы добавите людей и покупки.</div>
+      <template v-else>
+        <v-data-table :headers="tableHeaders" :items="tableItems" hide-actions class="ttable">
+          <template slot="headers" slot-scope="props">
+            <th v-for="header in props.headers" :key="header.text">
+              <span v-html="header.text"></span>
+            </th>
+          </template>
+          <template slot="items" slot-scope="props">
+            <td>{{ props.item.name }}</td>
+            <td class="debtor">
+              <v-checkbox height="48" v-model="props.item.isDebtor" @change="toggleDebtor(props.item)"></v-checkbox>
+            </td>
+            <td :class="totalClass(props.item.totalByPairs)"><b>{{ props.item.totalByPairs }}</b></td>
+            <td>{{ props.item.total }}</td>
+            <td>{{ props.item.spent }}</td>
+            <td v-for="p in purchases" :key="p.id">{{ props.item[p.id] }}</td>
+          </template>
+        </v-data-table>
+      </template>
       <BottomNav current="table"/>
     </v-content>
   </v-app>
@@ -122,5 +125,9 @@ export default {
 }
 .debtor {
   display: block;
+}
+.no-table-text {
+  text-align: center;
+  padding: 10px 20px; 
 }
 </style>
